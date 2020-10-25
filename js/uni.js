@@ -1,116 +1,134 @@
-$(function() {
-    consoleInit();
-    start(main);
+$(function () {
+  consoleInit();
+  start(main);
 });
 
 async function main() {
+  print_warning();
 
-    const stakingTokenAddr = PASTA_YYCRV_UNI_TOKEN_ADDR;
-    const stakingTokenTicker = "UNIV2";
-    const rewardPoolAddr = PASTA_YYCRV_REWARD_ADDR;
-    const rewardTokenAddr = PASTA_TOKEN_ADDR;
-    const rewardTokenTicker = "PASTA";
+  const TOKEN_ADDR = UNI_ADDR;
 
-    const App = await init_ethers();
+  const App = await init_ethers();
 
-    _print(`Initialized ${App.YOUR_ADDRESS}`);
-    _print("Reading smart contracts...\n");
-    _print(`${rewardTokenTicker} Address: ${rewardTokenAddr}`);
-    _print(`Reward Pool Address: ${rewardPoolAddr}\n`);
+  _print(`Initialized ${App.YOUR_ADDRESS}`);
+  _print('Reading smart contracts...\n');
+  _print(`${TOKEN_ADDR.tick} Address: ${TOKEN_ADDR.token}`);
+  _print(`Uniswap Pool Address: ${TOKEN_ADDR.pair}`);
+  _print(`Farm Staking Address: ${TOKEN_ADDR.stake}`);
+  _print(`\n\n`);
 
-    const REWARD_POOL = new ethers.Contract(rewardPoolAddr, P_STAKING_POOL_ABI, App.provider);
-    const STAKING_TOKEN = new ethers.Contract(stakingTokenAddr, ERC20_ABI, App.provider);
-    const CURVE_Y_POOL = new ethers.Contract(CURVE_Y_POOL_ADDR, CURVE_Y_POOL_ABI, App.provider);
-    const PASTA_TOKEN = new ethers.Contract(PASTA_TOKEN_ADDR, ERC20_ABI, App.provider);
-    const YYCRV_TOKEN = new ethers.Contract(YYCRV_TOKEN_ADDR, ERC20_ABI, App.provider);
-    const YEARN_VAULT_CONTROLLER = new ethers.Contract(YEARN_VAULT_CONTROLLER_ADDR, YEARN_VAULT_CONTROLLER_ABI, App.provider);
-    const vaultAddress = await YEARN_VAULT_CONTROLLER.vaults(YCRV_TOKEN_ADDR);
-    const vaultContract = new ethers.Contract(vaultAddress, YEARN_VAULT_ABI, App.provider);
-    const currentPricePerFullShare = await vaultContract.getPricePerFullShare();
+  const STAKING_POOL = new ethers.Contract(
+    TOKEN_ADDR.stake,
+    STAKING_POOL_ABI,
+    App.provider
+  );
+  const ERC20TOKEN = new ethers.Contract(
+    TOKEN_ADDR.token,
+    ERC20_ABI,
+    App.provider
+  );
 
-    const stakedYAmount = await REWARD_POOL.balanceOf(App.YOUR_ADDRESS) / 1e18;
-    const earnedYFFI = await REWARD_POOL.earned(App.YOUR_ADDRESS) / 1e18;
-    
-    const totalSupplyOfStakingToken = await STAKING_TOKEN.totalSupply() / 1e18;
-    const totalStakedYAmount = await STAKING_TOKEN.balanceOf(rewardPoolAddr) / 1e18;
+  const UNISWAP_PAIR = new ethers.Contract(
+    TOKEN_ADDR.pair,
+    UNISWAP_V2_PAIR_ABI,
+    App.provider
+  );
 
-    const totalYCRVInUniswapPair = await YYCRV_TOKEN.balanceOf(PASTA_YYCRV_UNI_TOKEN_ADDR) / 1e18;
-    const totalYAMInUniswapPair = await PASTA_TOKEN.balanceOf(PASTA_YYCRV_UNI_TOKEN_ADDR) / 1e18;
+  const SEAL = new ethers.Contract(SEAL_ADDR, ERC20_ABI, App.provider);
 
-    // Find out reward rate
-    const weekly_reward = await get_synth_weekly_rewards(REWARD_POOL) / 1e18;
-    const nextHalving = await getPeriodFinishForReward(REWARD_POOL);
+  //  uniswap pool stats
+  _print(`=======SEAL-${TOKEN_ADDR.tick} POOL ==========`);
+  const tokenInUniPool =
+    (await ERC20TOKEN.balanceOf(TOKEN_ADDR.pair)) / TOKEN_ADDR.denom;
+  const sealInUniPool = (await SEAL.balanceOf(TOKEN_ADDR.pair)) / 1e18;
+  const prices = await lookUpPrices([
+    TOKEN_ADDR.pricetick,
+    'seal-finance',
+    'ethereum',
+  ]);
+  console.log(prices);
+  // const stakingTokenPrice = prices['compound-governance-token'].usd;
+  // const rewardTokenPrice = prices['spaghetti'].usd;
+  _print(`1 ${TOKEN_ADDR.tick}  = $${prices[TOKEN_ADDR.pricetick].usd}`);
+  _print(`1 SEAL  = $${prices[`seal-finance`].usd}`);
+  _print(
+    `${TOKEN_ADDR.tick} in pair: ${tokenInUniPool}, worth: ${toDollar(
+      tokenInUniPool * prices[TOKEN_ADDR.pricetick].usd
+    )} `
+  );
+  _print(
+    `SEAL in pair: ${sealInUniPool}, worth: ${toDollar(
+      sealInUniPool * prices['seal-finance'].usd
+    )} `
+  );
 
-    const rewardPerToken = weekly_reward / totalStakedYAmount;
+  _print(`\n\n`);
+  _print('========== USER STATS ==========');
+  // user stats
+  const tokenBalance =
+    (await ERC20TOKEN.balanceOf(App.YOUR_ADDRESS)) / TOKEN_ADDR.denom; // erc20 token balance
+  const sealBalance = (await SEAL.balanceOf(App.YOUR_ADDRESS)) / 1e18; // seal token balance
+  const pairBalance = (await UNISWAP_PAIR.balanceOf(App.YOUR_ADDRESS)) / 1e18; // uniswap lp token balance, unstaked
+  _print(`${TOKEN_ADDR.tick} balance: ${tokenBalance}`);
+  _print(`SEAL balance: ${sealBalance}`);
+  _print(`unstaked LP token balance: ${pairBalance}`);
 
-    // Find out underlying assets of Y
-    const YVirtualPrice = await CURVE_Y_POOL.get_virtual_price() / 1e18;
-    const YYVirtualPrice = (YVirtualPrice * currentPricePerFullShare) / 1e18
-    const unstakedY = await STAKING_TOKEN.balanceOf(App.YOUR_ADDRESS) / 1e18;
-    const prices = await lookUpPrices(["ethereum", "spaghetti"]);
-    const stakingTokenPrice = (totalYAMInUniswapPair * prices["spaghetti"].usd + totalYCRVInUniswapPair * YYVirtualPrice) / totalSupplyOfStakingToken;
-    const rewardTokenPrice = prices["spaghetti"].usd;
+  const stakeTotal = (await STAKING_POOL.totalSupply()) / 1e18; // total share in stake unit
+  const userStake = (await STAKING_POOL.balanceOf(App.YOUR_ADDRESS)) / 1e18; // total share of user,
+  const totalValue = (await STAKING_POOL.totalValue()) / 1e18; // excluded expected amount
+  const userLPValue = (userStake * totalValue) / stakeTotal; // in unit of LP token
+  const totalLP = (await UNISWAP_PAIR.totalSupply()) / 1e18;
 
-    _print(`To get yyCRV deposit a stablecoin into curve to get yCRV or buy it on uniswap -> deposit yCRV into yearn.finance yVault\n`);
+  const userShare = userLPValue / totalLP;
+  const userShareWithFee = userShare * 0.95;
+  const userNetSeal = userShareWithFee * sealInUniPool;
+  const userNetToken = userShareWithFee * tokenInUniPool;
+  const userNetSealinUSD = userNetSeal * prices['seal-finance'].usd;
+  const userNetTokeninUSD = userNetToken * prices[TOKEN_ADDR.pricetick].usd;
 
-    _print("========== PRICES ==========")
-    _print(`1 ${rewardTokenTicker}    = $${rewardTokenPrice}`);
-    _print(`1 yyCRV    = $${YYVirtualPrice}`);
-    _print(`1 ${stakingTokenTicker}    = $${stakingTokenPrice}\n`);
+  const userNetWorth = toDollar(userNetSealinUSD + userNetTokeninUSD);
 
-    _print("========== STAKING =========")
-    _print(`There are total   : ${totalSupplyOfStakingToken} ${stakingTokenTicker}.`);
-    _print(`There are total   : ${totalStakedYAmount} ${stakingTokenTicker} staked in ${rewardTokenTicker}'s ${stakingTokenTicker} staking pool.`);
-    _print(`                  = ${toDollar(totalStakedYAmount * stakingTokenPrice)}\n`);
-    _print(`You are staking   : ${stakedYAmount} ${stakingTokenTicker} (${toFixed(stakedYAmount * 100 / totalStakedYAmount, 3)}% of the pool)`);
-    _print(`                  = ${toDollar(stakedYAmount * stakingTokenPrice)}\n`);
-    _print(`\n======== 🍝 ${rewardTokenTicker} REWARDS 🍝 ========`)
-    _print(`Claimable Rewards : ${toFixed(earnedYFFI, 4)} ${rewardTokenTicker} = $${toFixed(earnedYFFI * rewardTokenPrice, 2)}`);
-    const YFFIWeeklyEstimate = rewardPerToken * stakedYAmount;
-    _print(`Hourly estimate   : ${toFixed(YFFIWeeklyEstimate / (24 * 7), 4)} ${rewardTokenTicker} = ${toDollar((YFFIWeeklyEstimate / (24 * 7)) * rewardTokenPrice)} (out of total ${toFixed(weekly_reward / (7 * 24), 2)} ${rewardTokenTicker})`)
-    _print(`Daily estimate    : ${toFixed(YFFIWeeklyEstimate / 7, 2)} ${rewardTokenTicker} = ${toDollar((YFFIWeeklyEstimate / 7) * rewardTokenPrice)} (out of total ${toFixed(weekly_reward / 7, 2)} ${rewardTokenTicker})`)
-    _print(`Weekly estimate   : ${toFixed(YFFIWeeklyEstimate, 2)} ${rewardTokenTicker} = ${toDollar(YFFIWeeklyEstimate * rewardTokenPrice)} (out of total ${weekly_reward} ${rewardTokenTicker})`)
-    const YFIWeeklyROI = (rewardPerToken * rewardTokenPrice) * 100 / (stakingTokenPrice);
- 
-    _print(`\nHourly ROI in USD : ${toFixed((YFIWeeklyROI / 7) / 24, 4)}%`)
-    _print(`Daily ROI in USD  : ${toFixed(YFIWeeklyROI / 7, 4)}%`)
-    _print(`Weekly ROI in USD : ${toFixed(YFIWeeklyROI, 4)}%`)
-    _print(`APY (unstable)    : ${toFixed(YFIWeeklyROI * 52, 4)}% \n`)
+  _print(`staked lp token: ${userStake}`);
+  _print(`net lp token (withdrawal fee excluded): ${userLPValue}`);
+  _print(`net lp token (withdrawal fee included) : ${userLPValue * 0.95}`);
+  _print(`value worth (withdrawal fee included): ${userNetWorth}`);
 
-    const timeTilHalving = nextHalving - (Date.now() / 1000);
+  // const YFIWeeklyROI =
+  //   (rewardPerToken * rewardTokenPrice * 100) / stakingTokenPrice;
 
-    if (timeTilHalving > 1814400) {
-        _print(`Reward starting   : in ${forHumans(timeTilHalving - 1814400)} \n`);
-    } else {
-        _print(`Reward ending     : in ${forHumans(timeTilHalving)} \n`);
-    }
+  // _print(`\nHourly ROI in USD : ${toFixed(YFIWeeklyROI / 7 / 24, 4)}%`);
+  // _print(`Daily ROI in USD  : ${toFixed(YFIWeeklyROI / 7, 4)}%`);
+  // _print(`Weekly ROI in USD : ${toFixed(YFIWeeklyROI, 4)}%`);
+  // _print(`APY (unstable)    : ${toFixed(YFIWeeklyROI * 52, 4)}% \n`);
 
-    const resetApprove = async function() {
-       return rewardsContract_resetApprove(stakingTokenAddr, rewardPoolAddr, App);
-    };
+  // const timeTilHalving = nextHalving - Date.now() / 1000;
 
-    const approveTENDAndStake = async function () {
-        return rewardsContract_stake(stakingTokenAddr, rewardPoolAddr, App);
-    };
+  // if (timeTilHalving > 604800) {
+  //   _print(`Reward starting   : in ${forHumans(timeTilHalving - 604800)} \n`);
+  // } else {
+  //   _print(`Reward ending     : in ${forHumans(timeTilHalving)} \n`);
+  // }
 
-    const unstake = async function() {
-        return rewardsContract_unstake(rewardPoolAddr, App);
-    };
+  // const approveTENDAndStake = async function () {
+  //   return rewardsContract_stake(stakingTokenAddr, rewardPoolAddr, App);
+  // };
 
-    const claim = async function() {
-        return rewardsContract_claim(rewardPoolAddr, App);
-    };
+  // const unstake = async function () {
+  //   return rewardsContract_unstake(rewardPoolAddr, App);
+  // };
 
-    const exit = async function() {
-        return rewardsContract_exit(rewardPoolAddr, App);
-    };
+  // const claim = async function () {
+  //   return rewardsContract_claim(rewardPoolAddr, App);
+  // };
 
-    _print_link(`Reset approval to 0`, resetApprove);
-    _print_link(`Stake ${unstakedY} ${stakingTokenTicker}`, approveTENDAndStake);
-    _print_link(`Unstake ${stakedYAmount} ${stakingTokenTicker}`, unstake);
-    _print_link(`Claim ${earnedYFFI} ${rewardTokenTicker}`, claim);
-    _print_link(`Exit`, exit);
+  // const exit = async function () {
+  //   return rewardsContract_exit(rewardPoolAddr, App);
+  // };
 
-    hideLoading();
+  // _print_link(`Stake ${unstakedY} ${stakingTokenTicker}`, approveTENDAndStake);
+  // _print_link(`Unstake ${stakedYAmount} ${stakingTokenTicker}`, unstake);
+  // _print_link(`Claim ${earnedYFFI} ${rewardTokenTicker}`, claim);
+  // _print_link(`Exit`, exit);
 
+  hideLoading();
 }

@@ -6,7 +6,7 @@ $(function () {
 async function main() {
   print_warning();
 
-  const TOKEN_ADDR = SNX_ADDR;
+  const TOKEN_ADDR = MTA_ADDR;
 
   const App = await init_ethers();
 
