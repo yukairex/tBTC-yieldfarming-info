@@ -16,5 +16,4 @@ Try opening the page in incognito and see if it works. If it does, its probably 
 
 ### To-DO List
 
-1. add rebase stats
-2. add send tx link
+1. add send tx link
