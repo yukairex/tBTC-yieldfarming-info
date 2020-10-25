@@ -49,26 +49,36 @@ async function main() {
   console.log(prices);
 
   _print_bold(`SEAL price: ${toDollar(prices['seal-finance'].usd)}`);
-  _print(`SEAL TOTAL SUPPLY = ${sealTotalSupply}`);
+  _print_bold(`SEAL TOTAL SUPPLY = ${sealTotalSupply}`);
   _print(`\n\n`);
   _print(
-    `WBTC locked = ${toDollar(wbtcStaked * prices['wrapped-bitcoin'].usd)}\n`
-  );
-  _print(`WETH locked = ${toDollar(wethStaked * prices['ethereum'].usd)}\n`);
-  _print(`MTA locked  = ${toDollar(mtaStaked * prices['meta'].usd)}\n`);
-  _print(
-    `HAKKA locked = ${toDollar(hakkaStaked * prices['hakka-finance'].usd)}\n`
+    `WBTC pool locked = ${toDollar(
+      wbtcStaked * prices['wrapped-bitcoin'].usd * 2
+    )}\n`
   );
   _print(
-    `YFI locked  = ${toDollar(yfiStaked * prices['yearn-finance'].usd)}\n`
+    `WETH pool locked = ${toDollar(wethStaked * prices['ethereum'].usd * 2)}\n`
   );
-  _print(`LINK locked = ${toDollar(linkStaked * prices['chainlink'].usd)}\n`);
-  _print(`SNX locked  = ${toDollar(snxStaked * prices['havven'].usd)}\n`);
+  _print(`MTA locked  = ${toDollar(mtaStaked * prices['meta'].usd * 2)}\n`);
   _print(
-    `PICKLE locked = ${toDollar(pickleStaked * prices['pickle-finance'].usd)}\n`
+    `HAKKA locked = ${toDollar(
+      hakkaStaked * prices['hakka-finance'].usd * 2
+    )}\n`
   );
-  _print(`UNI locked = ${toDollar(uniStaked * prices['uniswap'].usd)}\n`);
-  _print(`USDT locked = ${toDollar(usdtStaked * prices['tether'].usd)}\n`);
+  _print(
+    `YFI locked  = ${toDollar(yfiStaked * prices['yearn-finance'].usd * 2)}\n`
+  );
+  _print(
+    `LINK locked = ${toDollar(linkStaked * prices['chainlink'].usd * 2)}\n`
+  );
+  _print(`SNX locked  = ${toDollar(snxStaked * prices['havven'].usd * 2)}\n`);
+  _print(
+    `PICKLE locked = ${toDollar(
+      pickleStaked * prices['pickle-finance'].usd * 2
+    )}\n`
+  );
+  _print(`UNI locked = ${toDollar(uniStaked * prices['uniswap'].usd * 2)}\n`);
+  _print(`USDT locked = ${toDollar(usdtStaked * prices['tether'].usd * 2)}\n`);
   _print(
     `TOTAL       = ${toDollar(
       wbtcStaked * prices['wrapped-bitcoin'].usd +
