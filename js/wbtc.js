@@ -88,10 +88,11 @@ async function main() {
 
   const userNetWorth = toDollar(userNetSealinUSD + userNetTokeninUSD);
 
-  _print(`staked lp token: ${userStake}`);
-  _print(`net lp token (withdrawal fee excluded): ${userLPValue}`);
-  _print(`net lp token (withdrawal fee included) : ${userLPValue * 0.95}`);
-  _print(`value worth (withdrawal fee included): ${userNetWorth}`);
+  _print(`staked LP token: ${userStake}`);
+  _print(`farmed LP token: ${userLPValue - userStake}`);
+  _print(`net LP token (withdrawal fee excluded): ${userLPValue}`);
+  _print(`net LP token (withdrawal fee included) : ${userLPValue * 0.95}`);
+  _print_bold(`value worth (withdrawal fee included): ${userNetWorth}`);
 
   // const YFIWeeklyROI =
   //   (rewardPerToken * rewardTokenPrice * 100) / stakingTokenPrice;
