@@ -47,8 +47,7 @@ async function main() {
     'ethereum',
   ]);
   console.log(prices);
-  // const stakingTokenPrice = prices['compound-governance-token'].usd;
-  // const rewardTokenPrice = prices['spaghetti'].usd;
+
   _print(`1 ${TOKEN_ADDR.tick}  = $${prices[TOKEN_ADDR.pricetick].usd}`);
   _print(`1 SEAL  = $${prices[`seal-finance`].usd}`);
   _print(
@@ -61,6 +60,31 @@ async function main() {
       sealInUniPool * prices['seal-finance'].usd
     )} `
   );
+  const withdrawRate = (await STAKING_POOL.withdrawRate()) / 1e18;
+  _print(`withdrawl fee [%]: ${toFixed((1 - withdrawRate) * 100, 2)}%`);
+  _print(`\n\n`);
+
+  _print('========== BREED STATS ==========');
+  const now = Math.floor(Date.now() / 1000);
+  const today = await STAKING_POOL.today();
+  const nowInDay = Math.floor(now / (24 * 60 * 60));
+  if (nowInDay > today) {
+    _print(`breeding happening`);
+  } else {
+    _print(`breeding in ${forHumans((nowInDay + 1) * 24 * 60 * 60 - now)}`);
+  }
+  const totalLP = (await UNISWAP_PAIR.totalSupply()) / 1e18;
+  const spawnRate = (await STAKING_POOL.spawnRate()) / 1e18;
+  const newSeal = sealInUniPool * spawnRate;
+  const newSealToCreate = newSeal * 2;
+  const newLPtoCreate = (newSeal / sealInUniPool) * totalLP;
+  const newValueBreed = newSealToCreate * prices['seal-finance'].usd;
+  const newValueBreedInPercent =
+    newValueBreed / (sealInUniPool * prices['seal-finance'].usd * 2);
+  _print(`seal to spawn: ${newSealToCreate}`);
+  _print(`LP token to create: ${newLPtoCreate}`);
+  _print(`breeding value: ${toDollar(newValueBreed)}`);
+  _print(`breeding value in [%]: ${toFixed(newValueBreedInPercent * 100, 2)}%`);
 
   _print(`\n\n`);
   _print('========== USER STATS ==========');
@@ -72,30 +96,30 @@ async function main() {
   _print(`${TOKEN_ADDR.tick} balance: ${tokenBalance}`);
   _print(`SEAL balance: ${sealBalance}`);
   _print(`unstaked LP token balance: ${pairBalance}`);
-
+  _print(`\n`);
   const stakeTotal = (await STAKING_POOL.totalSupply()) / 1e18; // total share in stake unit
   const userStake = (await STAKING_POOL.balanceOf(App.YOUR_ADDRESS)) / 1e18; // total share of user,
   const totalValue = (await STAKING_POOL.totalValue()) / 1e18; // excluded expected amount
   const userLPValue = (userStake * totalValue) / stakeTotal; // in unit of LP token
-  const totalLP = (await UNISWAP_PAIR.totalSupply()) / 1e18;
 
   const userShare = userLPValue / totalLP;
-  const userShareWithFee = userShare * 0.95;
+  const userShareWithFee = userShare * withdrawRate;
   const userNetSeal = userShareWithFee * sealInUniPool;
   const userNetToken = userShareWithFee * tokenInUniPool;
   const userNetSealinUSD = userNetSeal * prices['seal-finance'].usd;
   const userNetTokeninUSD = userNetToken * prices[TOKEN_ADDR.pricetick].usd;
-
   const userNetWorth = toDollar(userNetSealinUSD + userNetTokeninUSD);
 
   _print(`staked LP token: ${userStake}`);
   _print(`farmed LP token: ${userLPValue - userStake}`);
   _print(`net LP token (withdrawal fee excluded): ${userLPValue}`);
-  _print(`net LP token (withdrawal fee included) : ${userLPValue * 0.95}`);
+  _print(
+    `net LP token (withdrawal fee included) : ${userLPValue * withdrawRate}`
+  );
   _print_bold(`value worth (withdrawal fee included): ${userNetWorth}`);
 
   // const YFIWeeklyROI =
-  //   (rewardPerToken * rewardTokenPrice * 100) / stakingTokenPrice;
+  //   (rewardPerToken * rewardTokenPdrice * 100) / stakingTokenPrice;
 
   // _print(`\nHourly ROI in USD : ${toFixed(YFIWeeklyROI / 7 / 24, 4)}%`);
   // _print(`Daily ROI in USD  : ${toFixed(YFIWeeklyROI / 7, 4)}%`);
