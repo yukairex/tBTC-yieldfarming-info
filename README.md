@@ -1,4 +1,4 @@
-## spaghetti.money
+## SEAL FINANCE INFO
 
 App : https://www.sealfinance.info
 

@@ -33,6 +33,31 @@ async function main() {
   const usdtStaked = (await USDT.balanceOf(USDT_ADDR.pair)) / 1e6;
   const yfiStaked = (await YFI.balanceOf(YFI_ADDR.pair)) / 1e18;
 
+  const sealInWBTCPool = (await SEAL.balanceOf(WBTC_ADDR.pair)) / 1e18;
+  const sealInETHPool = (await SEAL.balanceOf(WETH_ADDR.pair)) / 1e18;
+  const sealInMTAPool = (await SEAL.balanceOf(MTA_ADDR.pair)) / 1e18;
+  const sealInHAKKAPool = (await SEAL.balanceOf(HAKKA_ADDR.pair)) / 1e18;
+  const sealInLINKPool = (await SEAL.balanceOf(LINK_ADDR.pair)) / 1e18;
+  const sealInPICKLEPool = (await SEAL.balanceOf(PICKLE_ADDR.pair)) / 1e18;
+  const sealInSNXPool = (await SEAL.balanceOf(SNX_ADDR.pair)) / 1e18;
+  const sealInUSDTPool = (await SEAL.balanceOf(USDT_ADDR.pair)) / 1e18;
+  const sealInYFIPool = (await SEAL.balanceOf(YFI_ADDR.pair)) / 1e18;
+  const sealInUNIPool = (await SEAL.balanceOf(UNI_ADDR.pair)) / 1e18;
+  const totalInStake =
+    sealInWBTCPool +
+    sealInMTAPool +
+    sealInHAKKAPool +
+    sealInLINKPool +
+    sealInPICKLEPool +
+    sealInSNXPool +
+    sealInUSDTPool +
+    sealInYFIPool +
+    sealInUNIPool;
+
+  const stakePercent = (totalInStake / sealTotalSupply) * 100;
+  const sealInEthPercent = (sealInETHPool / sealTotalSupply) * 100;
+  const floatSealPercent = 100 - stakePercent - sealInEthPercent;
+
   const prices = await lookUpPrices([
     'ethereum',
     'meta',
@@ -50,6 +75,9 @@ async function main() {
 
   _print_bold(`SEAL price: ${toDollar(prices['seal-finance'].usd)}`);
   _print_bold(`SEAL TOTAL SUPPLY = ${sealTotalSupply}`);
+  _print(`SEAL staked [%]= ${stakePercent}[%]`);
+  _print(`SEAL in ETH-SEAL pool [%] = ${sealInEthPercent}[%]`);
+  _print(`SEAL in the wild [%] = ${floatSealPercent}[%]`);
   _print(`\n\n`);
   _print(
     `WBTC pool locked = ${toDollar(
