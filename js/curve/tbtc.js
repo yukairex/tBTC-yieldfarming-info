@@ -108,7 +108,6 @@ async function main() {
       earnedCRV * prices['curve-dao-token'].usd
     )}\n`
   );
-  _print(`\n`);
   _print(
     `Weekly estimate   : ${
       weeklyRewardPerToken * yourStakedLP
