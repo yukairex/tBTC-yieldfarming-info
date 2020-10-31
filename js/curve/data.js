@@ -2,14 +2,12 @@
 const KEEP_TOKEN_ADDR = '0x85eee30c52b0b379b046fb0f85f4f3dc3009afec';
 const TBTC_TOKEN_ADDR = '0x8daebade922df735c38c80c7ebd708af50815faa';
 const WBTC_TOKEN_ADDR = '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599';
-const SUSHI_TOKEN_ADDR = '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2';
 
 const TBTC_CRV_METAPOOL_LP_TOKEN = '0x64eda51d3Ad40D56b9dFc5554E06F94e1Dd786Fd';
 const SBTC_CRV_BASEPOOL_LP_TOKEN = '0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3';
 
 // contracts
 const TBTC_CRV_POOL = '0xaa82ca713D94bBA7A89CEAB55314F9EfFEdDc78c'; // deposit address
-const TBTC_SUSHI_POOL = '';
 const TBTC_CRV_GAUGE = '0x6828bcF74279eE32f2723eC536c22c51Eed383C6';
 
 // ABIs:
@@ -202,7 +200,7 @@ const STAKING_ABI = [
     name: 'claimable_tokens',
     outputs: [{ type: 'uint256', name: '' }],
     inputs: [{ type: 'address', name: 'addr' }],
-    stateMutability: 'nonpayable',
+    stateMutability: 'view',
     type: 'function',
     gas: 2231999,
   },
