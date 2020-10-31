@@ -124,8 +124,8 @@ async function main() {
   _print(`Weekly ROI in USD : ${toFixed(CRVWeeklyROI, 4)}%`);
   _print(`APR (unstable)    : ${toFixed(CRVWeeklyROI * 52, 4)}% \n`);
 
-  // _print(`======= KEEP REWARDS ======`);
-  // _print(`    Not distributed yet`);
+  _print(`======= KEEP REWARDS ======`);
+  _print(`    Not distributed yet`);
   //  const earnedCRV = await STAKEING_POOL.claimable_token(App.YOUR_ADDRESS);
   // _print(`\n`);
   // //  uniswap pool stats
