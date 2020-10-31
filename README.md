@@ -1,10 +1,10 @@
-## SEAL FINANCE INFO
+## tBTC YieldFarming Info
 
-App : https://www.sealfinance.info
+App :
 
 ## How to use
 
-Load up the [app](https://www.sealfinance.info) with metamask enabled.
+Load up the [app](http URL) with metamask enabled.
 
 You can also append the url with `addr` parameter like below to specify an address that is not yours.
 
