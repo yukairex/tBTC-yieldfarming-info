@@ -25,9 +25,9 @@ async function main() {
     App.provider
   );
 
-  const CRV_LP_POOL = new ethers.Contract(
-    TBTC_CRV_POOL,
-    CRV_METAPOOL_ABI,
+  const CRV_GAUGECONTROL = new ethers.Contract(
+    CRV_GAUGE_CONTROLLER,
+    CRV_GAUGE_CONTROLLER_ABI,
     App.provider
   );
 
@@ -48,7 +48,7 @@ async function main() {
   ]);
 
   // didn't find crv lp token price from coingecko
-  const crvTBTCPoolLPPrice = prices['tbtc'].usd;
+  const crvTBTCPoolLPPrice = prices['wrapped-bitcoin'].usd;
 
   _print(`1 tBTC = $${prices['tbtc'].usd}`);
   _print(`1 WBTC = $${prices['wrapped-bitcoin'].usd}`);
@@ -66,9 +66,17 @@ async function main() {
   const yourStakedLP = (await STAKEING_POOL.balanceOf(App.YOUR_ADDRESS)) / 1e18;
   const stakingPoolPercentage = yourStakedLP / stakedLP;
 
-  _print(`There are total   : ${totalLP} tbtcCrv LP token given out by Curve.`);
   _print(
-    `There are total   : ${stakedLP} tbtcCrv LP token staked in curve gauge's pool.`
+    `There are total   : ${toFixed(
+      totalLP,
+      4
+    )} tbtcCrv LP token given out by Curve.`
+  );
+  _print(
+    `There are total   : ${toFixed(
+      stakedLP,
+      4
+    )} tbtcCrv LP token staked in curve gauge's pool.`
   );
   _print(`                  = ${toDollar(stakedLP * crvTBTCPoolLPPrice)} \n`);
   _print(
@@ -84,12 +92,16 @@ async function main() {
   _print(`======= CRV REWARDS =======`);
   const earnedCRV =
     (await STAKEING_POOL.claimable_tokens(App.YOUR_ADDRESS)) / 1e18;
-  const inflation_rate = (await STAKEING_POOL.inflation_rate()) / 1e18;
-  // weekly estimate;
-  const etherBlockRate = 15; // sec;
+
+  console.log(CRV_GAUGECONTROL.gauge_relative_weight);
+  // pool relative weight
+  const gaugeWeight =
+    (await CRV_GAUGECONTROL.gauge_relative_weight(TBTC_CRV_GAUGE)) / 1e18;
   const weeklyTotalReward =
-    (60 / etherBlockRate) * 60 * 24 * 7 * inflation_rate * 0.0203;
+    (await get_CRV_weekly_rewards(STAKEING_POOL)) * gaugeWeight;
+
   const weeklyRewardPerToken = weeklyTotalReward / stakedLP;
+  console.log(weeklyRewardPerToken);
   _print(`Claimable Rewards : ${earnedCRV} CRV`);
   _print(
     `                  = ${toDollar(
@@ -100,7 +112,7 @@ async function main() {
   _print(
     `Weekly estimate   : ${
       weeklyRewardPerToken * yourStakedLP
-    } CRV (out of total ${weeklyTotalReward} CRV)`
+    } CRV (out of total ${toFixed(weeklyTotalReward, 4)} CRV)`
   );
   _print(
     `                  = ${toDollar(
@@ -110,8 +122,8 @@ async function main() {
   const CRVWeeklyROI =
     (weeklyRewardPerToken * prices['curve-dao-token'].usd * 100) /
     crvTBTCPoolLPPrice;
-  _print(`Weekly ROI in USD : ${toFixed(weeklyRewardPerToken, 4)}%`);
-  _print(`APR (unstable)    : ${toFixed(weeklyRewardPerToken * 52, 4)}% \n`);
+  _print(`Weekly ROI in USD : ${toFixed(CRVWeeklyROI, 4)}%`);
+  _print(`APR (unstable)    : ${toFixed(CRVWeeklyROI * 52, 4)}% \n`);
 
   // _print(`======= KEEP REWARDS ======`);
   // _print(`    Not distributed yet`);

@@ -9,6 +9,7 @@ const SBTC_CRV_BASEPOOL_LP_TOKEN = '0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3';
 // contracts
 const TBTC_CRV_POOL = '0xaa82ca713D94bBA7A89CEAB55314F9EfFEdDc78c'; // deposit address
 const TBTC_CRV_GAUGE = '0x6828bcF74279eE32f2723eC536c22c51Eed383C6';
+const CRV_GAUGE_CONTROLLER = '0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB';
 
 // ABIs:
 
@@ -529,6 +530,18 @@ const STAKING_ABI = [
     stateMutability: 'view',
     type: 'function',
     gas: 2381,
+  },
+];
+
+// gauge controller abi
+const CRV_GAUGE_CONTROLLER_ABI = [
+  {
+    name: 'gauge_relative_weight',
+    outputs: [{ type: 'uint256', name: '' }],
+    inputs: [{ type: 'address', name: 'addr' }],
+    stateMutability: 'view',
+    type: 'function',
+    gas: 1000000,
   },
 ];
 

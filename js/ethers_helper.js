@@ -260,6 +260,17 @@ const get_synth_weekly_rewards = async function (synth_contract_instance) {
   return Math.round(rewardRate * 604800);
 };
 
+const get_CRV_weekly_rewards = async function (crv_contract_instance) {
+  // if (await isRewardPeriodOver(synth_contract_instance)) {
+  //   return 0;
+  // }
+
+  // calculate relative weight
+
+  const rewardRate = (await crv_contract_instance.inflation_rate()) / 1e18;
+  return Math.round(rewardRate * 604800);
+};
+
 const isRewardPeriodOver = async function (reward_contract_instance) {
   const now = Date.now() / 1000;
   const periodFinish = await getPeriodFinishForReward(reward_contract_instance);
