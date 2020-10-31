@@ -212,7 +212,7 @@ const STAKING_ABI = [
     inputs: [{ type: 'address', name: 'addr' }],
     stateMutability: 'view',
     type: 'function',
-    gas: 7300,
+    gas: 73000,
   },
   {
     name: 'kick',

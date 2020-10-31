@@ -91,24 +91,24 @@ async function main() {
     )}\n`
   );
   _print(`\n`);
-  _print(
-    `Weekly estimate   : ${
-      rewardPerToken * stakedCRVAmount
-    } SNX (out of total ${weekly_reward} SNX)`
-  );
-  _print(
-    `                  = ${toDollar(
-      rewardPerToken * stakedCRVAmount * SNXPrice
-    )}`
-  );
-  const SNXWeeklyROI =
-    (rewardPerToken * SNXPrice * 100) / crvPlain3andSUSDPricePerToken;
-  _print(`Weekly ROI in USD : ${toFixed(SNXWeeklyROI, 4)}%`);
-  _print(`APR (unstable)    : ${toFixed(SNXWeeklyROI * 52, 4)}% \n`);
+  // _print(
+  //   `Weekly estimate   : ${
+  //     rewardPerToken * stakedCRVAmount
+  //   } SNX (out of total ${weekly_reward} SNX)`
+  // );
+  // _print(
+  //   `                  = ${toDollar(
+  //     rewardPerToken * stakedCRVAmount * SNXPrice
+  //   )}`
+  // );
+  // const SNXWeeklyROI =
+  //   (rewardPerToken * SNXPrice * 100) / crvPlain3andSUSDPricePerToken;
+  // _print(`Weekly ROI in USD : ${toFixed(SNXWeeklyROI, 4)}%`);
+  // _print(`APR (unstable)    : ${toFixed(SNXWeeklyROI * 52, 4)}% \n`);
 
-  _print(`======= KEEP REWARDS ======`);
-  _print(`    Not distributed yet`);
-  _print(`\n`);
+  // _print(`======= KEEP REWARDS ======`);
+  // _print(`    Not distributed yet`);
+  // _print(`\n`);
   // //  uniswap pool stats
   // _print(`=======SEAL-${TOKEN_ADDR.tick} POOL ==========`);
   // const tokenInUniPool =
