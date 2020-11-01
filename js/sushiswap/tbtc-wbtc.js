@@ -147,7 +147,12 @@ async function main() {
     );
     const SUSHIWeeklyROI =
       (weeklyRewardPerToken * prices['sushi'].usd * 100) / lpValuePerToken;
-    _print(`Weekly ROI in USD : ${toFixed(SUSHIWeeklyROI, 4)}%`);
+    _print(
+      `Weekly ROI in USD : ${toFixed(
+        SUSHIWeeklyROI,
+        4
+      )}% (vesting SUSHI excluded)`
+    );
     _print(`APR (unstable)    : ${toFixed(SUSHIWeeklyROI * 52, 4)}% \n`);
   }
 
