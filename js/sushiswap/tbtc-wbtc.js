@@ -30,8 +30,8 @@ async function main() {
   _print(`Initialized ${App.YOUR_ADDRESS}`);
   _print('Reading smart contracts...\n');
   _print(`TBTC token Address: ${TBTC_TOKEN_ADDR}`);
-  _print(`Sushiswap tBTC-WBTC pool address: ${PAIR_ADDR}`);
-  _print(`Sushiswap tBTC-WBTC staking address: ${STAKE_ADDR}`);
+  _print(`Sushiswap ${PAIR_NAME} pool address: ${PAIR_ADDR}`);
+  _print(`Master Chef staking address: ${STAKE_ADDR}`);
   _print(`\n\n`);
 
   ///
@@ -118,33 +118,38 @@ async function main() {
 
   const totalAllocPoint = await STAKING_POOL.totalAllocPoint();
 
-  // calculate weekly reward of SUSHI;
-  const weeklyTotalReward =
-    (sushiPerBlock * 6430 * 7 * allocPoint) / totalAllocPoint;
+  if (allocPoint == 0) {
+    // if allocPoint is zero, showing suspended info
+    _print(`Rewards from this pool is temporarily suspended `);
+  } else {
+    // calculate weekly reward of SUSHI;
+    const weeklyTotalReward =
+      (sushiPerBlock * 6430 * 7 * allocPoint) / totalAllocPoint;
 
-  const weeklyRewardPerToken = weeklyTotalReward / stakedLP;
-  // console.log(weeklyRewardPerToken);
-  _print(`Claimable Rewards : ${earnedSushi} SUSHI`);
-  _print(
-    `                  = ${toDollar(earnedSushi * prices['sushi'].usd)}\n`
-  );
-  _print(
-    `Weekly estimate   : ${
-      weeklyRewardPerToken * yourStakedLP
-    } SUSHI (out of total ${toFixed(
-      weeklyTotalReward,
-      4
-    )} SUSHI from this pool)`
-  );
-  _print(
-    `                  = ${toDollar(
-      weeklyRewardPerToken * yourStakedLP * prices['sushi'].usd
-    )}`
-  );
-  const SUSHIWeeklyROI =
-    (weeklyRewardPerToken * prices['sushi'].usd * 100) / lpValuePerToken;
-  _print(`Weekly ROI in USD : ${toFixed(SUSHIWeeklyROI, 4)}%`);
-  _print(`APR (unstable)    : ${toFixed(SUSHIWeeklyROI * 52, 4)}% \n`);
+    const weeklyRewardPerToken = weeklyTotalReward / stakedLP;
+    // console.log(weeklyRewardPerToken);
+    _print(`Claimable Rewards : ${earnedSushi} SUSHI`);
+    _print(
+      `                  = ${toDollar(earnedSushi * prices['sushi'].usd)}\n`
+    );
+    _print(
+      `Weekly estimate   : ${
+        weeklyRewardPerToken * yourStakedLP
+      } SUSHI (out of total ${toFixed(
+        weeklyTotalReward,
+        4
+      )} SUSHI from this pool)`
+    );
+    _print(
+      `                  = ${toDollar(
+        weeklyRewardPerToken * yourStakedLP * prices['sushi'].usd
+      )}`
+    );
+    const SUSHIWeeklyROI =
+      (weeklyRewardPerToken * prices['sushi'].usd * 100) / lpValuePerToken;
+    _print(`Weekly ROI in USD : ${toFixed(SUSHIWeeklyROI, 4)}%`);
+    _print(`APR (unstable)    : ${toFixed(SUSHIWeeklyROI * 52, 4)}% \n`);
+  }
 
   // _print(`======= KEEP REWARDS ======`);
   // _print(`    Not distributed yet`);
