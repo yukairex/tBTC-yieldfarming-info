@@ -4,8 +4,6 @@ $(function () {
 });
 
 async function main() {
-  print_warning();
-
   const App = await init_ethers();
 
   _print(`Initialized ${App.YOUR_ADDRESS}`);

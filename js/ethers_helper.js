@@ -257,7 +257,7 @@ const get_synth_weekly_rewards = async function (synth_contract_instance) {
   }
 
   const rewardRate = await synth_contract_instance.rewardRate();
-  return Math.round(rewardRate * 604800);
+  return Math.round(rewardRate * 604800); // 604800 is secs per week
 };
 
 const get_CRV_weekly_rewards = async function (crv_contract_instance) {
