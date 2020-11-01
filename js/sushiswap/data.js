@@ -2,10 +2,11 @@
 const KEEP_TOKEN_ADDR = '0x85eee30c52b0b379b046fb0f85f4f3dc3009afec';
 const TBTC_TOKEN_ADDR = '0x8daebade922df735c38c80c7ebd708af50815faa';
 const WBTC_TOKEN_ADDR = '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599';
-
+const WETH_TOKEN_ADDR = '';
 // Ccontracts
 const WBTC_TBTC_SUSHI_PAIR = '0x2dbc7dd86c6cd87b525bd54ea73ebeebbc307f68';
 const MASTER_CHEF = '0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd';
+const WETH_TBTC_SUSHI_PAIR = '';
 
 // contracts
 const STAKING_POOL_ABI = [
