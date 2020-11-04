@@ -29,9 +29,15 @@ async function main() {
     App.provider
   );
 
-  const STAKEING_POOL = new ethers.Contract(
+  const STAKING_POOL = new ethers.Contract(
     TBTC_CRV_GAUGE,
     STAKING_ABI,
+    App.provider
+  );
+
+  const REWARD_POOL = new ethers.Contract(
+    KEEP_REWARD_POOL,
+    REWARD_POOL_ABI,
     App.provider
   );
 
@@ -58,10 +64,10 @@ async function main() {
 
   _print(`======= STAKING ==========`);
   const totalLP = (await CRV_LP_ERC20.totalSupply()) / 1e18;
-  const stakedLP = (await STAKEING_POOL.totalSupply()) / 1e18;
+  const stakedLP = (await STAKING_POOL.totalSupply()) / 1e18;
   const yourUnstakedLP =
     (await CRV_LP_ERC20.balanceOf(App.YOUR_ADDRESS)) / 1e18;
-  const yourStakedLP = (await STAKEING_POOL.balanceOf(App.YOUR_ADDRESS)) / 1e18;
+  const yourStakedLP = (await STAKING_POOL.balanceOf(App.YOUR_ADDRESS)) / 1e18;
   const stakingPoolPercentage = yourStakedLP / stakedLP;
 
   _print(
@@ -89,14 +95,14 @@ async function main() {
 
   _print(`======= CRV REWARDS =======`);
   const earnedCRV =
-    (await STAKEING_POOL.claimable_tokens(App.YOUR_ADDRESS)) / 1e18;
+    (await STAKING_POOL.claimable_tokens(App.YOUR_ADDRESS)) / 1e18;
 
   console.log(CRV_GAUGECONTROL.gauge_relative_weight);
   // pool relative weight
   const gaugeWeight =
     (await CRV_GAUGECONTROL.gauge_relative_weight(TBTC_CRV_GAUGE)) / 1e18;
   const weeklyTotalReward =
-    (await get_CRV_weekly_rewards(STAKEING_POOL)) * gaugeWeight;
+    (await get_CRV_weekly_rewards(STAKING_POOL)) * gaugeWeight;
 
   const weeklyRewardPerToken = weeklyTotalReward / stakedLP;
   console.log(weeklyRewardPerToken);
@@ -123,8 +129,26 @@ async function main() {
   _print(`APR (unstable)    : ${toFixed(CRVWeeklyROI * 52, 4)}% \n`);
 
   _print(`======= KEEP REWARDS ======`);
-  _print(`    Not distributed yet`);
-  //  const earnedCRV = await STAKEING_POOL.claimable_token(App.YOUR_ADDRESS);
+  const earnedKEEP =
+    (await STAKING_POOL.claimable_reward(App.YOUR_ADDRESS)) / 1e18;
+  const weeklyKeepReward = await get_synth_weekly_rewards(REWARD_POOL);
+  const keepRewardPerToken = weeklyKeepReward / stakedLP;
+  console.log(weeklyKeepReward);
+  _print(`Claimable Rewards : ${earnedKEEP} KEEP`);
+  _print(
+    `                  = ${toDollar(earnedKEEP * prices['keep-network'].usd)}\n`
+  );
+  _print(
+    `                  = ${toDollar(
+      keepRewardPerToken * yourStakedLP * prices['keep-network'].usd
+    )}`
+  );
+  const KeepWeeklyROI =
+    (keepRewardPerToken * prices['keep-network'].usd * 100) /
+    crvTBTCPoolLPPrice;
+  _print(`Weekly ROI in USD : ${toFixed(KeepWeeklyROI, 4)}%`);
+  _print(`APR (unstable)    : ${toFixed(KeepWeeklyROI * 52, 4)}% \n`);
+  //  const earnedCRV = await STAKING_POOL.claimable_token(App.YOUR_ADDRESS);
   // _print(`\n`);
   // //  uniswap pool stats
 
