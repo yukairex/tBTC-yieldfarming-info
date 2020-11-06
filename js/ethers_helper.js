@@ -571,6 +571,51 @@ const rewardsContract_claim = async function (rewardPoolAddr, App) {
   }
 };
 
+const sushi_harvest = async function (rewardPoolAddr, poolId, amount, App) {
+  // deposit 0
+  await sushi_stake(rewardPoolAddr, poolId, 0, App);
+};
+
+const sushi_stake = async function (rewardPoolAddr, poolId, amount, App) {
+  // deposit 0
+  const signer = App.provider.getSigner();
+
+  const MASTERCHEF_POOL = new ethers.Contract(
+    rewardPoolAddr,
+    STAKING_POOL_ABI,
+    signer
+  );
+
+  showLoading();
+  MASTERCHEF_POOL.deposit(poolId, amount, { gasLimit: 250000 })
+    .then(function (t) {
+      return App.provider.waitForTransaction(t.hash);
+    })
+    .catch(function () {
+      hideLoading();
+    });
+};
+
+const sushi_unstake = async function (rewardPoolAddr, poolId, amount, App) {
+  // deposit 0
+  const signer = App.provider.getSigner();
+
+  const MASTERCHEF_POOL = new ethers.Contract(
+    rewardPoolAddr,
+    STAKING_POOL_ABI,
+    signer
+  );
+
+  showLoading();
+  MASTERCHEF_POOL.withdraw(poolId, amount, { gasLimit: 250000 })
+    .then(function (t) {
+      return App.provider.waitForTransaction(t.hash);
+    })
+    .catch(function () {
+      hideLoading();
+    });
+};
+
 const print_warning = function () {
   _print_bold(
     'WARNING: THIS CONTRACT IS NOT AUDITED. DO NOT USE THIS WEBSITE UNLESS YOU HAVE REVIEWED THE CONTRACTS.\n'

@@ -104,6 +104,15 @@ async function main() {
     )}% of the pool)`
   );
   _print(`                  = ${toDollar(yourStakedLP * lpValuePerToken)} \n`);
+  _print(
+    `Your unstaked LP  : ${yourUnstakedLP} LP (${toFixed(
+      stakingPoolPercentage,
+      5
+    )}% of the pool)`
+  );
+  _print(
+    `                  = ${toDollar(yourUnstakedLP * lpValuePerToken)} \n`
+  );
 
   _print(`======= SUSHI REWARDS =======`);
   const earnedSushi =
@@ -120,7 +129,7 @@ async function main() {
 
   if (allocPoint == 0) {
     // if allocPoint is zero, showing suspended info
-    _print(`Rewards from this pool is temporarily suspended `);
+    _print(`No rewards from this pool at this moment `);
   } else {
     // calculate weekly reward of SUSHI;
     const weeklyTotalReward =
