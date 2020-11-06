@@ -6,6 +6,8 @@ $(function () {
 async function main() {
   const App = await init_ethers();
 
+  // check address
+  //App.YOUR_ADDRESS = '0x0be722795469468e04ce572eb77eb5882c94d6f5';
   // input data
   const PAIR_ADDR = WETH_TBTC_SUSHI_PAIR;
   const STAKE_ADDR = MASTER_CHEF;
