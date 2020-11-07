@@ -131,18 +131,18 @@ async function main() {
   _print(`======= KEEP REWARDS ======`);
   const earnedKEEP =
     (await STAKING_POOL.claimable_reward(App.YOUR_ADDRESS)) / 1e18;
-  const weeklyKeepReward = await get_synth_weekly_rewards(REWARD_POOL);
+  const weeklyKeepReward = (await get_synth_weekly_rewards(REWARD_POOL)) / 1e18;
   const keepRewardPerToken = weeklyKeepReward / stakedLP;
   console.log(weeklyKeepReward);
   _print(`Claimable Rewards : ${earnedKEEP} KEEP`);
   _print(
     `                  = ${toDollar(earnedKEEP * prices['keep-network'].usd)}\n`
   );
-  _print(
-    `                  = ${toDollar(
-      keepRewardPerToken * yourStakedLP * prices['keep-network'].usd
-    )}`
-  );
+  // _print(
+  //   `                  = ${toDollar(
+  //     keepRewardPerToken * yourStakedLP * prices['keep-network'].usd
+  //   )}`
+  // );
   const KeepWeeklyROI =
     (keepRewardPerToken * prices['keep-network'].usd * 100) /
     crvTBTCPoolLPPrice;

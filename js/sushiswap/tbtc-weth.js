@@ -184,10 +184,10 @@ async function main() {
     return sushi_unstake(STAKE_ADDR, POOLID, temp[0], App);
   };
 
-  _print(`\n\n`);
-  _print_link(`Stake your LP`, stake);
-  _print_link(`Unstake your LP`, unstake);
-  _print_link(`Harvest Sushi`, harvest);
+  // _print(`\n\n`);
+  // _print_link(`Stake your LP`, stake);
+  // _print_link(`Unstake your LP`, unstake);
+  // _print_link(`Harvest Sushi`, harvest);
 
   hideLoading();
 }
