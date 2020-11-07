@@ -138,11 +138,16 @@ async function main() {
   _print(
     `                  = ${toDollar(earnedKEEP * prices['keep-network'].usd)}\n`
   );
-  // _print(
-  //   `                  = ${toDollar(
-  //     keepRewardPerToken * yourStakedLP * prices['keep-network'].usd
-  //   )}`
-  // );
+  _print(
+    `Weekly estimate   : ${
+      keepRewardPerToken * yourStakedLP
+    } KEEP (out of total ${toFixed(weeklyKeepReward, 1)} KEEP)`
+  );
+  _print(
+    `                  = ${toDollar(
+      keepRewardPerToken * yourStakedLP * prices['keep-network'].usd
+    )}`
+  );
   const KeepWeeklyROI =
     (keepRewardPerToken * prices['keep-network'].usd * 100) /
     crvTBTCPoolLPPrice;
