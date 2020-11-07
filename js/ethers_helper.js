@@ -571,12 +571,24 @@ const rewardsContract_claim = async function (rewardPoolAddr, App) {
   }
 };
 
-const sushi_harvest = async function (rewardPoolAddr, poolId, amount, App) {
+const sushi_harvest = async function (
+  stakeTokenAddr,
+  rewardPoolAddr,
+  poolId,
+  amount,
+  App
+) {
   // deposit 0
-  await sushi_stake(rewardPoolAddr, poolId, 0, App);
+  await sushi_stake(stakeTokenAddr, rewardPoolAddr, poolId, 0, App);
 };
 
-const sushi_stake = async function (rewardPoolAddr, poolId, amount, App) {
+const sushi_stake = async function (
+  stakeTokenAddr,
+  rewardPoolAddr,
+  poolId,
+  amount,
+  App
+) {
   // deposit 0
   const signer = App.provider.getSigner();
 
@@ -586,14 +598,45 @@ const sushi_stake = async function (rewardPoolAddr, poolId, amount, App) {
     signer
   );
 
-  showLoading();
-  MASTERCHEF_POOL.deposit(poolId, amount, { gasLimit: 250000 })
-    .then(function (t) {
-      return App.provider.waitForTransaction(t.hash);
-    })
-    .catch(function () {
-      hideLoading();
-    });
+  const LP_TOKEN = new ethers.Contract(stakeTokenAddr, ERC20_ABI, signer);
+
+  const lpBalance = await LP_TOKEN.balanceOf(App.YOUR_ADDRESS);
+  const approvedBalance = await LP_TOKEN.allowance(
+    App.YOUR_ADDRESS,
+    rewardPoolAddr
+  );
+
+  if (approvedBalance / 1e18 < lpBalance / 1e18) {
+    showLoading();
+    allow = LP_TOKEN.approve(rewardPoolAddr, ethers.constants.MaxUint256)
+      .then(function (t) {
+        return App.provider.waitForTransaction(t.hash);
+      })
+      .catch(function () {
+        hideLoading();
+        alert('Try resetting your approval to 0 first');
+      });
+  }
+
+  if (lpBalance / 1e18 > 0) {
+    showLoading();
+    allow
+      .then(async function () {
+        MASTERCHEF_POOL.deposit(poolId, amount, { gasLimit: 250000 })
+          .then(function (t) {
+            hideLoading();
+            return App.provider.waitForTransaction(t.hash);
+          })
+          .catch(function () {
+            hideLoading();
+            _print('Something went wrong.');
+          });
+      })
+      .catch(function () {
+        hideLoading();
+        _print('Something went wrong.');
+      });
+  }
 };
 
 const sushi_unstake = async function (rewardPoolAddr, poolId, amount, App) {

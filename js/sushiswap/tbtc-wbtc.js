@@ -103,7 +103,7 @@ async function main() {
       5
     )}% of the pool)`
   );
-  _print(`                  = ${toDollar(yourStakedLP * lpValuePerToken)} \n`);
+  _print(`                  = ${toDollar(yourStakedLP * lpValuePerToken)}`);
   _print(
     `Your unstaked LP  : ${yourUnstakedLP} LP (${toFixed(
       stakingPoolPercentage,
@@ -165,11 +165,25 @@ async function main() {
     _print(`APR (unstable)    : ${toFixed(SUSHIWeeklyROI * 52, 4)}% \n`);
   }
 
-  // _print(`======= KEEP REWARDS ======`);
-  // _print(`    Not distributed yet`);
-  // //  const earnedCRV = await STAKEING_POOL.claimable_token(App.YOUR_ADDRESS);
-  // // _print(`\n`);
-  // // //  uniswap pool stats
+  // add method to stake, unstake, harvest method
+  const stake = async function () {
+    let temp = await SUSHI_PAIR.balanceOf(App.YOUR_ADDRESS);
+    return sushi_stake(STAKE_ADDR, POOLID, temp, App);
+  };
+
+  const harvest = async function () {
+    return sushi_stake(STAKE_ADDR, POOLID, 0, App);
+  };
+
+  const unstake = async function () {
+    let temp = await STAKING_POOL.userInfo(POOLID, App.YOUR_ADDRESS);
+    return sushi_unstake(STAKE_ADDR, POOLID, temp[0], App);
+  };
+
+  _print(`\n\n`);
+  _print_link(`Stake your LP`, stake);
+  _print_link(`Unstake your LP`, unstake);
+  _print_link(`Harvest Sushi`, harvest);
 
   hideLoading();
 }
