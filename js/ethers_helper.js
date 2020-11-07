@@ -606,7 +606,10 @@ const sushi_stake = async function (
     rewardPoolAddr
   );
 
-  if (approvedBalance / 1e18 < lpBalance / 1e18) {
+  let allow = Promise.resolve();
+
+  if (approvedBalance / 1e8 < lpBalance / 1e8) {
+    console.log('not enough allowance, do approve first');
     showLoading();
     allow = LP_TOKEN.approve(rewardPoolAddr, ethers.constants.MaxUint256)
       .then(function (t) {
@@ -618,7 +621,7 @@ const sushi_stake = async function (
       });
   }
 
-  if (lpBalance / 1e18 > 0) {
+  if (lpBalance / 1e8 > 0) {
     showLoading();
     allow
       .then(async function () {
