@@ -168,11 +168,11 @@ async function main() {
   // add method to stake, unstake, harvest method
   const stake = async function () {
     let temp = await SUSHI_PAIR.balanceOf(App.YOUR_ADDRESS);
-    return sushi_stake(STAKE_ADDR, POOLID, temp, App);
+    return sushi_stake(PAIR_ADDR, STAKE_ADDR, POOLID, temp, App);
   };
 
   const harvest = async function () {
-    return sushi_stake(STAKE_ADDR, POOLID, 0, App);
+    return sushi_stake(PAIR_ADDR, STAKE_ADDR, POOLID, 0, App);
   };
 
   const unstake = async function () {
