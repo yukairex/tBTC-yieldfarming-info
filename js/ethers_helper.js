@@ -662,6 +662,46 @@ const sushi_unstake = async function (rewardPoolAddr, poolId, amount, App) {
     });
 };
 
+// curve withdraw LP
+const crv_withdraw_lp = async function (gaugeAddress, amount, App) {
+  // deposit 0
+  const signer = App.provider.getSigner();
+
+  const GAUGE_POOL = new ethers.Contract(gaugeAddress, STAKING_ABI, signer);
+
+  showLoading();
+  GAUGE_POOL.withdraw(amount, { gasLimit: 250000 })
+    .then(function (t) {
+      return App.provider.waitForTransaction(t.hash);
+    })
+    .catch(function () {
+      hideLoading();
+    });
+};
+
+// curve claim curve
+const crv_claim = async function (gaugeAddress, App) {
+  // deposit 0
+  await crv_withdraw_lp(gaugeAddress, 0, App);
+};
+
+// curve claim Keep
+const keep_claim = async function (gaugeAddress, App) {
+  // deposit 0
+  const signer = App.provider.getSigner();
+
+  const GAUGE_POOL = new ethers.Contract(gaugeAddress, STAKING_ABI, signer);
+
+  showLoading();
+  GAUGE_POOL.claim_rewards({ gasLimit: 250000 })
+    .then(function (t) {
+      return App.provider.waitForTransaction(t.hash);
+    })
+    .catch(function () {
+      hideLoading();
+    });
+};
+
 const print_warning = function () {
   _print_bold(
     'WARNING: THIS CONTRACT IS NOT AUDITED. DO NOT USE THIS WEBSITE UNLESS YOU HAVE REVIEWED THE CONTRACTS.\n'

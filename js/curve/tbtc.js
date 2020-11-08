@@ -128,6 +128,20 @@ async function main() {
   _print(`Weekly ROI in USD : ${toFixed(CRVWeeklyROI, 4)}%`);
   _print(`APR (unstable)    : ${toFixed(CRVWeeklyROI * 52, 4)}% \n`);
 
+  // add method to stake, unstake, harvest method
+  const withdraw = async function () {
+    let temp = await STAKING_POOL.balanceOf(App.YOUR_ADDRESS);
+    return crv_withdraw_lp(TBTC_CRV_GAUGE, temp, App);
+  };
+
+  const claim_crv = async function () {
+    return crv_claim(TBTC_CRV_GAUGE, App);
+  };
+
+  _print_link(`withdraw LP`, withdraw);
+  _print_link(`claim CRV`, claim_crv);
+
+  _print(`\n`);
   _print(`======= KEEP REWARDS ======`);
   const earnedKEEP =
     (await STAKING_POOL.claimable_reward(App.YOUR_ADDRESS)) / 1e18;
@@ -153,8 +167,12 @@ async function main() {
     crvTBTCPoolLPPrice;
   _print(`Weekly ROI in USD : ${toFixed(KeepWeeklyROI, 4)}%`);
   _print(`APR (unstable)    : ${toFixed(KeepWeeklyROI * 52, 4)}% \n`);
-  //  const earnedCRV = await STAKING_POOL.claimable_token(App.YOUR_ADDRESS);
-  // _print(`\n`);
+
+  const claim_keep = async function () {
+    return keep_claim(TBTC_CRV_GAUGE, App);
+  };
+
+  _print_link(`claim KEEP`, claim_keep);
   // //  uniswap pool stats
 
   hideLoading();
