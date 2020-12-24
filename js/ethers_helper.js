@@ -271,6 +271,13 @@ const get_CRV_weekly_rewards = async function (crv_contract_instance) {
   return Math.round(rewardRate * 604800);
 };
 
+const get_keep_weekly_rewards = async function (synth_contract_instance) {
+  const rewardRate = await synth_contract_instance.rewardRate();
+  return Math.round(rewardRate * 604800); // 604800 is secs per week
+};
+
+
+
 const isRewardPeriodOver = async function (reward_contract_instance) {
   const now = Date.now() / 1000;
   const periodFinish = await getPeriodFinishForReward(reward_contract_instance);
@@ -661,6 +668,113 @@ const sushi_unstake = async function (rewardPoolAddr, poolId, amount, App) {
       hideLoading();
     });
 };
+
+
+
+const uni_stake = async function (
+  stakeTokenAddr,
+  rewardPoolAddr,
+  amount,
+  App
+) {
+  // deposit 0
+  const signer = App.provider.getSigner();
+
+  const STAKING_POOL = new ethers.Contract(
+    rewardPoolAddr,
+    STAKING_POOL_ABI,
+    signer
+  );
+
+  const LP_TOKEN = new ethers.Contract(stakeTokenAddr, ERC20_ABI, signer);
+
+  const lpBalance = await LP_TOKEN.balanceOf(App.YOUR_ADDRESS);
+
+  const approvedBalance = await LP_TOKEN.allowance(
+    App.YOUR_ADDRESS,
+    rewardPoolAddr
+  );
+
+  let allow = Promise.resolve();
+
+  if (approvedBalance / 1e8 < lpBalance / 1e8) {
+    console.log('not enough allowance, do approve first');
+    showLoading();
+    allow = LP_TOKEN.approve(rewardPoolAddr, ethers.constants.MaxUint256)
+      .then(function (t) {
+        return App.provider.waitForTransaction(t.hash);
+      })
+      .catch(function () {
+        hideLoading();
+        alert('Try resetting your approval to 0 first');
+      });
+  }
+
+  if (lpBalance / 1e8 > 0) {
+    showLoading();
+    allow
+      .then(async function () {
+        STAKING_POOL.stake(amount, { gasLimit: 250000 })
+          .then(function (t) {
+            hideLoading();
+            return App.provider.waitForTransaction(t.hash);
+          })
+          .catch(function () {
+            hideLoading();
+            _print('Something went wrong.');
+          });
+      })
+      .catch(function () {
+        hideLoading();
+        _print('Something went wrong.');
+      });
+  }
+};
+
+
+
+const uni_unstake = async function (rewardPoolAddr, amount, App) {
+  // deposit 0
+  const signer = App.provider.getSigner();
+
+  const STAKING_POOL = new ethers.Contract(
+    rewardPoolAddr,
+    STAKING_POOL_ABI,
+    signer
+  );
+
+  showLoading();
+  STAKING_POOL.withdraw( amount, { gasLimit: 250000 })
+    .then(function (t) {
+      return App.provider.waitForTransaction(t.hash);
+    })
+    .catch(function () {
+      hideLoading();
+    });
+};
+
+
+const uni_harvest = async function (rewardPoolAddr, App) {
+  // deposit 0
+  const signer = App.provider.getSigner();
+
+  const STAKING_POOL = new ethers.Contract(
+    rewardPoolAddr,
+    STAKING_POOL_ABI,
+    signer
+  );
+
+  showLoading();
+  STAKING_POOL.getReward({ gasLimit: 250000 })
+    .then(function (t) {
+      return App.provider.waitForTransaction(t.hash);
+    })
+    .catch(function () {
+      hideLoading();
+    });
+};
+
+
 
 // curve withdraw LP
 const crv_withdraw_lp = async function (gaugeAddress, amount, App) {
