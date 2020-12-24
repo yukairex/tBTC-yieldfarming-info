@@ -142,7 +142,7 @@ async function main() {
   // add method to stake, unstake, harvest method
   const stake = async function () {
     let amount = await UNI_PAIR.balanceOf(App.YOUR_ADDRESS);
-    return uni_stake(STAKE_ADDR, amount, App);
+    return uni_stake(PAIR_ADDR, STAKE_ADDR, amount, App);
   };
 
   const harvest = async function () {
