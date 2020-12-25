@@ -80,6 +80,7 @@ async function main() {
   const yourUnstakedLP = (await UNI_PAIR.balanceOf(App.YOUR_ADDRESS)) / 1e18;
   const yourStakedLP = await STAKING_POOL.balanceOf(App.YOUR_ADDRESS) / 1e18;
   const stakingPoolPercentage = yourStakedLP / stakedLP;
+  const unstakingPoolPercentage = yourUnstakedLP / stakedLP;
 
   _print(
     `There are total   : ${toFixed(
@@ -96,14 +97,14 @@ async function main() {
   _print(`                  = ${toDollar(stakedLP * lpValuePerToken)} \n`);
   _print(
     `You are staking   : ${yourStakedLP} LP (${toFixed(
-      stakingPoolPercentage,
+      stakingPoolPercentage*100,
       5
     )}% of the pool)`
   );
   _print(`                  = ${toDollar(yourStakedLP * lpValuePerToken)}`);
   _print(
     `Your unstaked LP  : ${yourUnstakedLP} LP (${toFixed(
-      stakingPoolPercentage,
+      unstakingPoolPercentage*100,
       5
     )}% of the pool)`
   );
