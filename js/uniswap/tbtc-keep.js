@@ -150,9 +150,9 @@ async function main() {
   };
 
   const unstake = async function () {
-    let amount = await STAKING_POOL.balanceOf(App.YOUR_ADDRESS);
-    return uni_unstake(STAKE_ADDR, amount, App);
+    return uni_unstake(STAKE_ADDR, App);
   };
+
 
   _print(`\n\n`);
   _print_link(`Stake your LP`, stake);

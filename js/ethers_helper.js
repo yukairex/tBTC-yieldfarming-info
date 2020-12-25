@@ -733,7 +733,7 @@ const uni_stake = async function (
 
 
 
-const uni_unstake = async function (rewardPoolAddr, amount, App) {
+const uni_unstake = async function (rewardPoolAddr, App) {
   // deposit 0
   const signer = App.provider.getSigner();
 
@@ -744,7 +744,7 @@ const uni_unstake = async function (rewardPoolAddr, amount, App) {
   );
 
   showLoading();
-  STAKING_POOL.withdraw( amount, { gasLimit: 250000 })
+  STAKING_POOL.exit( { gasLimit: 250000 })
     .then(function (t) {
       return App.provider.waitForTransaction(t.hash);
     })
