@@ -80,7 +80,7 @@ async function main() {
   const yourUnstakedLP = (await UNI_PAIR.balanceOf(App.YOUR_ADDRESS)) / 1e18;
   const yourStakedLP = await STAKING_POOL.balanceOf(App.YOUR_ADDRESS) / 1e18;
   const stakingPoolPercentage = yourStakedLP / stakedLP;
-  const stakingPoolPercentage = yourUnstakedLP / stakedLP;
+  const unstakingPoolPercentage = yourUnstakedLP / stakedLP;
 
 
   _print(
