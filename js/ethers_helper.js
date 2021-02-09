@@ -276,8 +276,6 @@ const get_keep_weekly_rewards = async function (synth_contract_instance) {
   return Math.round(rewardRate * 604800); // 604800 is secs per week
 };
 
-
-
 const isRewardPeriodOver = async function (reward_contract_instance) {
   const now = Date.now() / 1000;
   const periodFinish = await getPeriodFinishForReward(reward_contract_instance);
@@ -669,14 +667,7 @@ const sushi_unstake = async function (rewardPoolAddr, poolId, amount, App) {
     });
 };
 
-
-
-const uni_stake = async function (
-  stakeTokenAddr,
-  rewardPoolAddr,
-  amount,
-  App
-) {
+const uni_stake = async function (stakeTokenAddr, rewardPoolAddr, amount, App) {
   // deposit 0
   const signer = App.provider.getSigner();
 
@@ -731,8 +722,6 @@ const uni_stake = async function (
   }
 };
 
-
-
 const uni_unstake = async function (rewardPoolAddr, App) {
   // deposit 0
   const signer = App.provider.getSigner();
@@ -744,7 +733,7 @@ const uni_unstake = async function (rewardPoolAddr, App) {
   );
 
   showLoading();
-  STAKING_POOL.exit( { gasLimit: 250000 })
+  STAKING_POOL.exit({ gasLimit: 250000 })
     .then(function (t) {
       return App.provider.waitForTransaction(t.hash);
     })
@@ -752,7 +741,6 @@ const uni_unstake = async function (rewardPoolAddr, App) {
       hideLoading();
     });
 };
-
 
 const uni_harvest = async function (rewardPoolAddr, App) {
   // deposit 0
@@ -773,8 +761,6 @@ const uni_harvest = async function (rewardPoolAddr, App) {
       hideLoading();
     });
 };
-
-
 
 // curve withdraw LP
 const crv_withdraw_lp = async function (gaugeAddress, amount, App) {
