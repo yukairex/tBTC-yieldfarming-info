@@ -678,7 +678,6 @@ const uni_stake = async function (stakeTokenAddr, rewardPoolAddr, amount, App) {
   );
 
   const LP_TOKEN = new ethers.Contract(stakeTokenAddr, ERC20_ABI, signer);
-
   const lpBalance = await LP_TOKEN.balanceOf(App.YOUR_ADDRESS);
 
   const approvedBalance = await LP_TOKEN.allowance(
@@ -719,6 +718,8 @@ const uni_stake = async function (stakeTokenAddr, rewardPoolAddr, amount, App) {
         hideLoading();
         _print('Something went wrong.');
       });
+  } else {
+    _print('You dont have any lp token');
   }
 };
 
