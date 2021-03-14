@@ -890,3 +890,11 @@ const vault_unstake = async function (rewardPoolAddr, amount, App) {
       hideLoading();
     });
 };
+
+const isExpired = async function (STAKING_POOL) {
+  const timenow = Date.now() / 1e3;
+  console.log(('now:', timenow));
+  const periodFinished = await STAKING_POOL.periodFinish();
+  console.log(periodFinished / 1);
+  return timenow > periodFinished;
+};

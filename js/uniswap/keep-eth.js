@@ -66,9 +66,9 @@ async function main() {
   const poolValue =
     token1Amount * prices[token1_info.pricetick].usd +
     token2Amount * prices[token2_info.pricetick].usd;
-  
-    console.log(token1Amount)
-    console.log(token2Amount)
+
+  console.log(token1Amount);
+  console.log(token2Amount);
   _print(`1 ${token1_info.tick} = $${prices[token1_info.pricetick].usd}`);
   _print(`1 ${token2_info.tick} = $${prices[token2_info.pricetick].usd}`);
   _print(`\n`);
@@ -78,7 +78,7 @@ async function main() {
   const stakedLP = (await UNI_PAIR.balanceOf(STAKE_ADDR)) / 1e18;
   const lpValuePerToken = poolValue / totalLP;
   const yourUnstakedLP = (await UNI_PAIR.balanceOf(App.YOUR_ADDRESS)) / 1e18;
-  const yourStakedLP = await STAKING_POOL.balanceOf(App.YOUR_ADDRESS) / 1e18;
+  const yourStakedLP = (await STAKING_POOL.balanceOf(App.YOUR_ADDRESS)) / 1e18;
   const stakingPoolPercentage = yourStakedLP / stakedLP;
   const unstakingPoolPercentage = yourUnstakedLP / stakedLP;
 
@@ -97,14 +97,14 @@ async function main() {
   _print(`                  = ${toDollar(stakedLP * lpValuePerToken)} \n`);
   _print(
     `You are staking   : ${yourStakedLP} LP (${toFixed(
-      stakingPoolPercentage*100,
+      stakingPoolPercentage * 100,
       5
     )}% of the pool)`
   );
   _print(`                  = ${toDollar(yourStakedLP * lpValuePerToken)}`);
   _print(
     `Your unstaked LP  : ${yourUnstakedLP} LP (${toFixed(
-      unstakingPoolPercentage*100,
+      unstakingPoolPercentage * 100,
       5
     )}% of the pool)`
   );
@@ -113,8 +113,8 @@ async function main() {
   );
 
   _print(`======= KEEP REWARDS ======`);
-  const earnedKEEP =
-    (await STAKING_POOL.earned(App.YOUR_ADDRESS)) / 1e18;
+
+  const earnedKEEP = (await STAKING_POOL.earned(App.YOUR_ADDRESS)) / 1e18;
   const weeklyKeepReward = (await get_keep_weekly_rewards(STAKING_POOL)) / 1e18;
   const keepRewardPerToken = weeklyKeepReward / stakedLP;
   console.log(weeklyKeepReward);
@@ -122,28 +122,34 @@ async function main() {
   _print(
     `                  = ${toDollar(earnedKEEP * prices['keep-network'].usd)}\n`
   );
-  _print(
-    `Weekly estimate   : ${
-      keepRewardPerToken * yourStakedLP
-    } KEEP (out of total ${toFixed(weeklyKeepReward, 1)} KEEP)`
-  );
-  _print(
-    `                  = ${toDollar(
-      keepRewardPerToken * yourStakedLP * prices['keep-network'].usd
-    )}`
-  );
-  const KeepWeeklyROI =
-    (keepRewardPerToken * prices['keep-network'].usd * 100) /
-    lpValuePerToken;
-  console.log('keepRewrd per token:',keepRewardPerToken)
 
-  _print(`Weekly ROI in USD : ${toFixed(KeepWeeklyROI, 4)}%`);
-  _print(`APR (unstable)    : ${toFixed(KeepWeeklyROI * 52, 4)}% \n`);
+  const expired = await isExpired(STAKING_POOL);
+  console.log(expired);
+  if (expired) {
+    _print('Currently this staking pool is NOT active');
+  } else {
+    _print(
+      `Weekly estimate   : ${
+        keepRewardPerToken * yourStakedLP
+      } KEEP (out of total ${toFixed(weeklyKeepReward, 1)} KEEP)`
+    );
+    _print(
+      `                  = ${toDollar(
+        keepRewardPerToken * yourStakedLP * prices['keep-network'].usd
+      )}`
+    );
+    const KeepWeeklyROI =
+      (keepRewardPerToken * prices['keep-network'].usd * 100) / lpValuePerToken;
+    console.log('keepRewrd per token:', keepRewardPerToken);
+
+    _print(`Weekly ROI in USD : ${toFixed(KeepWeeklyROI, 4)}%`);
+    _print(`APR (unstable)    : ${toFixed(KeepWeeklyROI * 52, 4)}% \n`);
+  }
 
   // add method to stake, unstake, harvest method
   const stake = async function () {
     let amount = await UNI_PAIR.balanceOf(App.YOUR_ADDRESS);
-    return uni_stake(PAIR_ADDR,STAKE_ADDR, amount, App);
+    return uni_stake(PAIR_ADDR, STAKE_ADDR, amount, App);
   };
 
   const harvest = async function () {
