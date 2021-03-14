@@ -808,3 +808,85 @@ const print_warning = function () {
     'WARNING: THIS CONTRACT IS NOT AUDITED. DO NOT USE THIS WEBSITE UNLESS YOU HAVE REVIEWED THE CONTRACTS.\n'
   );
 };
+
+const vault_stake = async function (
+  stakeTokenAddr,
+  rewardPoolAddr,
+  amount,
+  App
+) {
+  // deposit 0
+  const signer = App.provider.getSigner();
+
+  const STAKING_POOL = new ethers.Contract(
+    rewardPoolAddr,
+    STAKING_POOL_ABI,
+    signer
+  );
+
+  const LP_TOKEN = new ethers.Contract(stakeTokenAddr, ERC20_ABI, signer);
+  const lpBalance = await LP_TOKEN.balanceOf(App.YOUR_ADDRESS);
+
+  const approvedBalance = await LP_TOKEN.allowance(
+    App.YOUR_ADDRESS,
+    rewardPoolAddr
+  );
+
+  let allow = Promise.resolve();
+
+  if (approvedBalance / 1e8 < lpBalance / 1e8) {
+    console.log('not enough allowance, do approve first');
+    showLoading();
+    allow = LP_TOKEN.approve(rewardPoolAddr, ethers.constants.MaxUint256)
+      .then(function (t) {
+        return App.provider.waitForTransaction(t.hash);
+      })
+      .catch(function () {
+        hideLoading();
+        alert('Try resetting your approval to 0 first');
+      });
+  }
+
+  if (lpBalance / 1e8 > 0) {
+    showLoading();
+    allow
+      .then(async function () {
+        STAKING_POOL.stake(amount, 0, { gasLimit: 250000 })
+          .then(function (t) {
+            hideLoading();
+            return App.provider.waitForTransaction(t.hash);
+          })
+          .catch(function () {
+            hideLoading();
+            _print('Something went wrong.');
+          });
+      })
+      .catch(function () {
+        hideLoading();
+        _print('Something went wrong.');
+      });
+  } else {
+    _print('You dont have any KEEP token');
+  }
+};
+
+const vault_unstake = async function (rewardPoolAddr, amount, App) {
+  // deposit 0
+  const signer = App.provider.getSigner();
+
+  const STAKING_POOL = new ethers.Contract(
+    rewardPoolAddr,
+    STAKING_POOL_ABI,
+    signer
+  );
+
+  console.log('here');
+  showLoading();
+  STAKING_POOL.unstake(amount, 0, { gasLimit: 250000 })
+    .then(function (t) {
+      return App.provider.waitForTransaction(t.hash);
+    })
+    .catch(function () {
+      hideLoading();
+    });
+};

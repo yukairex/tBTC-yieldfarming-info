@@ -72,7 +72,7 @@ async function main() {
     )}`
   );
   _print(
-    `Your wallet  : ${yourUnstakedLP} KEEP (${toFixed(
+    `Token in wallet   : ${yourUnstakedLP} KEEP (${toFixed(
       unstakingPoolPercentage * 100,
       2
     )}% of the pool)`
@@ -107,24 +107,37 @@ async function main() {
   _print(`Monthly ROI in USD : ${toFixed(KeepMonthlyROI, 4)}%`);
   _print(`APR (unstable)    : ${toFixed(KeepMonthlyROI * 12, 4)}% \n`);
 
-  // // add method to stake, unstake, harvest method
-  // const stake = async function () {
-  //   let amount = await SADDLE_LP_TOKEN.balanceOf(App.YOUR_ADDRESS);
-  //   console.log(amount);
-  //   return uni_stake(POOL_LP, STAKE_ADDR, amount, App);
-  // };
+  // add method to stake, unstake, harvest method
+  const stake = async function () {
+    let amount = await KEEP_TOKEN.balanceOf(App.YOUR_ADDRESS);
+    console.log(amount);
+    return vault_stake(POOL_LP, STAKE_ADDR, amount, App);
+  };
 
-  // const harvest = async function () {
-  //   return uni_harvest(STAKE_ADDR, App);
-  // };
+  const unstake = async function () {
+    let amount = await STAKING_POOL.totalStakedFor(App.YOUR_ADDRESS);
+    console.log(amount);
+    return vault_unstake(STAKE_ADDR, amount, App);
+  };
 
-  // const unstake = async function () {
-  //   return uni_unstake(STAKE_ADDR, App);
-  // };
+  const unstake_10p = async function () {
+    let amount = await STAKING_POOL.totalStakedFor(App.YOUR_ADDRESS);
+    let unstaked_amount = amount.mul(10).div(100);
+    console.log(unstaked_amount / 1e18);
+    return vault_unstake(STAKE_ADDR, unstaked_amount, App);
+  };
+  const unstake_50p = async function () {
+    let amount = await STAKING_POOL.totalStakedFor(App.YOUR_ADDRESS);
+    let unstaked_amount = amount.mul(50).div(100);
+    console.log(unstaked_amount / 1e18);
+    return vault_unstake(STAKE_ADDR, unstaked_amount, App);
+  };
 
-  // _print(`\n\n`);
-  // _print_link(`Stake your LP`, stake);
-  // _print_link(`Unstake your LP`, unstake);
+  _print(`\n\n`);
+  _print_link(`Stake your KEEP`, stake);
+  _print_link(`Unstake 10% KEEP`, unstake_10p);
+  _print_link(`Unstake 50% KEEP`, unstake_50p);
+  _print_link(`Unstake all KEEP`, unstake);
   // _print_link(`Harvest KEEP`, harvest);
 
   hideLoading();
