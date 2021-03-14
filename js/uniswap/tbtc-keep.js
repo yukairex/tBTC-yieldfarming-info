@@ -159,7 +159,9 @@ async function main() {
   };
 
   _print(`\n\n`);
-  _print_link(`Stake your LP`, stake);
+  if (!expired) {
+    _print_link(`Stake your LP`, stake);
+  }
   _print_link(`Unstake your LP`, unstake);
   _print_link(`Harvest KEEP`, harvest);
 
